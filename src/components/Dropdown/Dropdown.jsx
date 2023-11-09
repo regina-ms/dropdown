@@ -4,52 +4,41 @@ import { useState } from "react";
 export default function Dropdown(props) {
     const { list } = props;
 
-    const [state, setState] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const [selected, setSelected] = useState(null);
 
     function clickHandler() {
-        setState(prev => !prev);
+        setIsOpen(prev => !prev);
+    }
+
+    function selectItemHandler(el) {
+        setSelected(el)
     }
 
     return (
-        state ?
-            <div data-id="wrapper" className="dropdown-wrapper open">
+
+            <div data-id="wrapper" className={`dropdown-wrapper ${isOpen ? 'open' : ''}`}>
                 <button data-id="toggle" className="btn" onClick={clickHandler} >
                     <span>Account Settings</span>
                     <i className="material-icons">public</i>
                 </button>
-                <DropdownList items={list}></DropdownList>
-            </div>
-            :
-            <div data-id="wrapper" className="dropdown-wrapper ">
-                <button data-id="toggle" className="btn" onClick={clickHandler} >
-                    <span>Account Settings</span>
-                    <i className="material-icons">public</i>
-                </button>
-                <DropdownList items={list}></DropdownList>
+                { isOpen && <DropdownList onSelectItem ={selectItemHandler} selectItem={selected} items={list}></DropdownList>}
             </div>
     )
 }
 
-function DropdownList(props) {
-    const { items } = props;
+function DropdownList({onSelectItem, selectItem, items}) {
 
     return <ul className="dropdown" data-id="dropdown">
-        {items.map((el) => (<DropdownItem item={el} />)
+        {items.map((el, index) => (<DropdownItem item={el} onClick={onSelectItem} isActive={selectItem === el} key={index}/>)
         )}
     </ul>
 }
 
-function DropdownItem(props) {
-    const { item } = props;
-
-    const [state, setState] = useState(false);
-
-    function clickItemHandler() {
-        setState(prev => !prev)
-    }
-
+function DropdownItem({item, onClick, isActive}) {
     return (
-        state ? <li onClick={clickItemHandler} className='active'><a href="#">{item}</a></li> :
-            <li onClick={clickItemHandler} ><a href="#">{item}</a></li>
+        <li onClick={() => onClick(item)} className={isActive ? 'active' : ''}><a href="#">{item}</a></li> 
+            
     )
 }
